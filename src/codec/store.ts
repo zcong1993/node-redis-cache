@@ -2,7 +2,7 @@ import { Codec } from './codec'
 import { JSONCodec } from './json'
 import { RawCodec } from './raw'
 
-let defaultCodec: Codec = new JSONCodec()
+let defaultCodec: string = 'json'
 
 let defaultSetted: boolean = false
 
@@ -12,7 +12,7 @@ export const registerCodec = (codec: Codec) => {
   codecMap.set(codec.name(), codec)
 }
 
-export const setDefaultCodec = (codec: Codec) => {
+export const setDefaultCodec = (codec: string) => {
   if (defaultSetted) {
     throw new Error('default codec can only set once')
   }
@@ -22,12 +22,11 @@ export const setDefaultCodec = (codec: Codec) => {
 }
 
 registerCodec(new RawCodec())
-
-console.log(codecMap)
+registerCodec(new JSONCodec())
 
 export const getCodec = (name?: string) => {
   if (!name) {
-    return defaultCodec
+    return codecMap.get(defaultCodec)
   }
 
   if (!codecMap.has(name)) {
