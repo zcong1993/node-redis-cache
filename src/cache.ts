@@ -1,9 +1,7 @@
-import { createHash } from 'crypto'
-import { EventEmitter } from 'events'
-import { Singleflight } from '@zcong/singleflight'
 import { Redis } from 'ioredis'
+import { createHash } from 'crypto'
+import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
-import IORedis = require('ioredis')
 
 export interface Option {
   redis: Redis
@@ -17,10 +15,19 @@ export const md5Hasher: Hasher = (...args: any[]) => {
   return createHash('md5').update(JSON.stringify(args)).digest('hex')
 }
 
-export class RedisCache extends EventEmitter {
+export interface ErrorEvent {
+  key: string
+  error: Error
+  action: string
+}
+
+export type ErrorHandler = (errorEvent: ErrorEvent) => void
+const noopHandler: ErrorHandler = () => {}
+
+export class RedisCache {
+  onError: ErrorHandler = noopHandler
   private readonly sf = new Singleflight()
   constructor(private readonly option: Option) {
-    super()
     if (!this.option.codec) {
       this.option.codec = 'json'
     }
@@ -38,7 +45,7 @@ export class RedisCache extends EventEmitter {
         return cached
       }
     } catch (err) {
-      this.emit('error', {
+      this.onError({
         key,
         error: err,
         action: 'get cache',
@@ -50,7 +57,7 @@ export class RedisCache extends EventEmitter {
       try {
         await this.set(key, res, expire, codec)
       } catch (err) {
-        this.emit('error', {
+        this.onError({
           key,
           error: err,
           action: 'set cache',
@@ -102,51 +109,3 @@ export class RedisCache extends EventEmitter {
     return keys.join(':')
   }
 }
-
-const main = async () => {
-  const redis = new IORedis()
-  const cc = new RedisCache({
-    redis,
-    prefix: 'test',
-  })
-
-  const sleep = (n: number) => new Promise((r) => setTimeout(r, n))
-
-  const res = await Promise.all(
-    Array(10)
-      .fill(null)
-      .map(() =>
-        cc.cacheFn(
-          'test111',
-          async () => {
-            console.log('inner')
-            await sleep(1000)
-            return {
-              name: 'zcong',
-              age: 18,
-            }
-          },
-          10
-        )
-      )
-  )
-
-  console.log(res)
-
-  const fn = async (name: string, age: number) => {
-    await sleep(1000)
-    return `${name}:${age}`
-  }
-
-  const fn2 = cc.cacheWrapper('fn', fn, 10, 'raw')
-
-  const res2 = await Promise.all(
-    Array(10)
-      .fill(null)
-      .map(() => fn2('test', 18))
-  )
-
-  console.log(res2)
-}
-
-main()
