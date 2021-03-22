@@ -2,11 +2,13 @@ import { Redis } from 'ioredis'
 import { createHash } from 'crypto'
 import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
+import { loadPackage } from './utils'
 
 export interface Option {
   redis: Redis
   prefix: string
   codec?: string
+  withPrometheus?: boolean
 }
 
 export type Hasher = (...args: any[]) => string
@@ -24,12 +26,24 @@ export interface ErrorEvent {
 export type ErrorHandler = (errorEvent: ErrorEvent) => void
 const noopHandler: ErrorHandler = () => {}
 
+let promClient: any = undefined
+
+let requestsCounter: any
+let hitCounter: any
+let errorsCounter: any
+
 export class RedisCache {
   onError: ErrorHandler = noopHandler
   private readonly sf = new Singleflight()
   constructor(private readonly option: Option) {
     if (!this.option.codec) {
       this.option.codec = 'json'
+    }
+    if (option.withPrometheus && !promClient) {
+      promClient = loadPackage('prom-client', 'withPrometheus', () =>
+        require('prom-client')
+      )
+      this.setupPrometheus()
     }
   }
 
@@ -39,12 +53,15 @@ export class RedisCache {
     expire: number,
     codec?: string
   ): Promise<T> {
+    this.incrCounter(requestsCounter, 1)
     try {
       const cached = await this.get(key, codec)
       if (cached !== null) {
+        this.incrCounter(hitCounter, 1)
         return cached
       }
     } catch (err) {
+      this.incrCounter(errorsCounter, 1)
       this.onError({
         key,
         error: err,
@@ -57,6 +74,7 @@ export class RedisCache {
       try {
         await this.set(key, res, expire, codec)
       } catch (err) {
+        this.incrCounter(errorsCounter, 1)
         this.onError({
           key,
           error: err,
@@ -107,5 +125,33 @@ export class RedisCache {
 
   private static joinKey(...keys: string[]) {
     return keys.join(':')
+  }
+
+  private setupPrometheus() {
+    if (!this.option.withPrometheus) {
+      return
+    }
+
+    requestsCounter = new promClient.Counter({
+      name: 'cache_requests_total',
+      help: 'Total number of requests to the cache.',
+    })
+
+    hitCounter = new promClient.Counter({
+      name: 'cache_hits_total',
+      help: 'Total number of requests to the cache that were a hit.',
+    })
+
+    errorsCounter = new promClient.Counter({
+      name: 'cache_errors_total',
+      help: 'Total number of errors to the cache.',
+    })
+  }
+
+  private incrCounter(counter: any, val: number) {
+    if (!counter || val <= 0) {
+      return
+    }
+    counter.inc(val)
   }
 }
