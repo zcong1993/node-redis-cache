@@ -14,6 +14,9 @@ export interface Option {
 export type Hasher = (...args: any[]) => string
 
 export const md5Hasher: Hasher = (...args: any[]) => {
+  if (args.length === 0) {
+    return ''
+  }
   return createHash('md5').update(JSON.stringify(args)).digest('hex')
 }
 
@@ -124,7 +127,7 @@ export class RedisCache {
   }
 
   private static joinKey(...keys: string[]) {
-    return keys.join(':')
+    return keys.filter(Boolean).join(':')
   }
 
   private setupPrometheus() {
