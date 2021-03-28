@@ -33,5 +33,5 @@ jobs:
       - name: run test
         run: yarn test:cov
       - uses: codecov/codecov-action@v1
-        # with:
-        #   token: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
