@@ -4,11 +4,15 @@ import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
 import { loadPackage } from './utils'
 
+export const notFoundPlaceholder = '*'
+export type IsNotFound = (val: any) => boolean
 export interface Option {
   redis: Redis
   prefix: string
   codec?: string
   withPrometheus?: boolean
+  notFoundExpire?: number
+  isNOtFound?: IsNotFound
 }
 
 export type Hasher = (...args: any[]) => string
@@ -27,7 +31,6 @@ export interface ErrorEvent {
 }
 
 export type ErrorHandler = (errorEvent: ErrorEvent) => void
-const noopHandler: ErrorHandler = () => {}
 
 let promClient: any = undefined
 
@@ -35,13 +38,25 @@ let requestsCounter: any
 let hitCounter: any
 let errorsCounter: any
 
+const noopHandler: ErrorHandler = () => {}
+
+const defaultIsNotFound = (val: any) => val === null
+
+const defaultOption: Partial<Option> = {
+  codec: 'json',
+  notFoundExpire: 10,
+  isNOtFound: defaultIsNotFound,
+}
+
 export class RedisCache {
   onError: ErrorHandler = noopHandler
   private readonly sf = new Singleflight()
   constructor(private readonly option: Option) {
-    if (!this.option.codec) {
-      this.option.codec = 'json'
+    this.option = {
+      ...defaultOption,
+      ...option,
     }
+
     if (option.withPrometheus && !promClient) {
       promClient = loadPackage('prom-client', 'withPrometheus', () =>
         require('prom-client')
@@ -58,10 +73,16 @@ export class RedisCache {
   ): Promise<T> {
     this.incrCounter(requestsCounter, 1)
     try {
-      const cached = await this.get(key, codec)
-      if (cached !== null) {
+      const [val, isNOtFound] = await this.get(key, codec)
+      // if is not found cache, return null
+      if (isNOtFound) {
         this.incrCounter(hitCounter, 1)
-        return cached
+        return null
+      }
+
+      if (val !== null) {
+        this.incrCounter(hitCounter, 1)
+        return val
       }
     } catch (err) {
       this.incrCounter(errorsCounter, 1)
@@ -101,15 +122,35 @@ export class RedisCache {
     }) as any) as T
   }
 
-  async get<T = any>(key: string, codec?: string): Promise<T> {
+  /**
+   * get data from cache
+   * @param key
+   * @param codec
+   * @returns [val, isNotFound]
+   */
+  async get<T = any>(key: string, codec?: string): Promise<[T, boolean]> {
     const val = await this.option.redis.get(this.buildKey(key))
-    if (!val) {
-      return null
+    if (val === notFoundPlaceholder) {
+      return [null, true]
     }
-    return this.getCodecByName(codec).decode(val)
+
+    if (!val) {
+      return [null, false]
+    }
+    const vv: T = this.getCodecByName(codec).decode(val)
+    return [vv, false]
   }
 
   async set<T = any>(key: string, val: T, expire: number, codec?: string) {
+    if (this.option.isNOtFound(val)) {
+      await this.option.redis.set(
+        this.buildKey(key),
+        notFoundPlaceholder,
+        'ex',
+        this.option.notFoundExpire
+      )
+      return
+    }
     const vv = this.getCodecByName(codec).encode(val)
     await this.option.redis.set(this.buildKey(key), vv, 'ex', expire)
   }
