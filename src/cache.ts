@@ -156,8 +156,11 @@ export class RedisCache {
     await this.option.redis.set(this.buildKey(key), vv, 'ex', expire)
   }
 
-  async delete(key: string) {
-    await this.option.redis.del(this.buildKey(key))
+  async delete(...keys: string[]) {
+    if (keys.length === 0) {
+      return
+    }
+    await this.option.redis.del(...keys.map((key) => this.buildKey(key)))
   }
 
   private buildKey(key: string) {
