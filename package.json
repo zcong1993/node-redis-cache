@@ -1,6 +1,6 @@
 {
   "name": "@zcong/node-redis-cache",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "simple cache lib on redis",
   "main": "./dist/index.js",
   "files": [
