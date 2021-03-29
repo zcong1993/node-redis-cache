@@ -37,6 +37,7 @@ let promClient: any = undefined
 let requestsCounter: any
 let hitCounter: any
 let errorsCounter: any
+let hitNotFoundCacheCounter: any
 
 const noopHandler: ErrorHandler = () => {}
 
@@ -76,7 +77,7 @@ export class RedisCache {
       const [val, isNOtFound] = await this.get(key, codec)
       // if is not found cache, return null
       if (isNOtFound) {
-        this.incrCounter(hitCounter, 1)
+        this.incrCounter(hitNotFoundCacheCounter, 1)
         return null
       }
 
@@ -189,6 +190,11 @@ export class RedisCache {
     errorsCounter = new promClient.Counter({
       name: 'cache_errors_total',
       help: 'Total number of errors to the cache.',
+    })
+
+    hitNotFoundCacheCounter = new promClient.Counter({
+      name: 'cache_hit_not_found_cache_total',
+      help: 'Total number of requests to the cache that hit a not found cache.',
     })
   }
 
