@@ -181,22 +181,22 @@ export class RedisCache {
     }
 
     requestsCounter = new promClient.Counter({
-      name: 'cache_requests_total',
+      name: 'node_cache_requests_total',
       help: 'Total number of requests to the cache.',
     })
 
     hitCounter = new promClient.Counter({
-      name: 'cache_hits_total',
+      name: 'node_cache_hits_total',
       help: 'Total number of requests to the cache that were a hit.',
     })
 
     errorsCounter = new promClient.Counter({
-      name: 'cache_errors_total',
+      name: 'node_cache_errors_total',
       help: 'Total number of errors to the cache.',
     })
 
     hitNotFoundCacheCounter = new promClient.Counter({
-      name: 'cache_hit_not_found_cache_total',
+      name: 'node_cache_hit_not_found_cache_total',
       help: 'Total number of requests to the cache that hit a not found cache.',
     })
   }
