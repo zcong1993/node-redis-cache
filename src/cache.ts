@@ -1,4 +1,4 @@
-import { Redis } from 'ioredis'
+import { Redis, Cluster } from 'ioredis'
 import { createHash } from 'crypto'
 import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
@@ -7,7 +7,7 @@ import { loadPackage } from './utils'
 export const notFoundPlaceholder = '*'
 export type IsNotFound = (val: any) => boolean
 export interface Option {
-  redis: Redis
+  redis: Redis | Cluster
   prefix: string
   codec?: string
   withPrometheus?: boolean
@@ -121,6 +121,15 @@ export class RedisCache {
       const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
       return this.cacheFn(cacheKey, () => fn(...args), expire, codec)
     }) as any) as T
+  }
+
+  async deleteFnCache(
+    keyPrefix: string,
+    args: any[],
+    keyHasher: Hasher = md5Hasher
+  ) {
+    const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
+    await this.delete(cacheKey)
   }
 
   /**

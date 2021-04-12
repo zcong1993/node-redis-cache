@@ -21,7 +21,7 @@ const repeatCall = (n: number, fn: Function) =>
       .map((_) => fn())
   )
 
-it('cacheFn should works well', async () => {
+it('cacheWrapper should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
     redis: new Redis(),
@@ -194,4 +194,27 @@ it('withPrometheus should works well', async () => {
   expect(fn).toBeCalledTimes(2)
 
   expect(await register.metrics()).toMatchSnapshot()
+})
+
+it('deleteFnCache should works well', async () => {
+  const fn = jest.fn(mockFn)
+  const c = new RedisCache({
+    redis: new Redis(),
+    prefix: 'test7',
+  })
+
+  const mockRes = { name: 'test', age: 18 }
+  const cf = c.cacheWrapper('fn', fn, 5)
+  expect(await cf(100, mockRes)).toEqual(mockRes)
+  expect(fn).toBeCalledTimes(1)
+  await repeatCall(2, async () => {
+    const res = await cf(100, mockRes)
+    expect(res).toEqual(mockRes)
+  })
+  expect(fn).toBeCalledTimes(1)
+
+  await c.deleteFnCache('fn', [100, mockRes])
+
+  expect(await cf(100, mockRes)).toEqual(mockRes)
+  expect(fn).toBeCalledTimes(2)
 })
