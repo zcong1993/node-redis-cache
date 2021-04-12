@@ -1,3 +1,9 @@
+# [0.4.0](https://github.com/zcong1993/node-redis-cache/compare/v0.3.2...v0.4.0) (2021-04-12)
+
+### Features
+
+- add deleteFnCache method ([5ef0af2](https://github.com/zcong1993/node-redis-cache/commit/5ef0af2498297a6cfa43eb6bb46ff948a4a93e35))
+
 ## [0.3.2](https://github.com/zcong1993/node-redis-cache/compare/v0.3.1...v0.3.2) (2021-04-01)
 
 ## [0.3.1](https://github.com/zcong1993/node-redis-cache/compare/v0.3.0...v0.3.1) (2021-03-29)
