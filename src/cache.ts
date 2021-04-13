@@ -49,7 +49,41 @@ const defaultOption: Partial<Option> = {
   isNOtFound: defaultIsNotFound,
 }
 
-export class RedisCache {
+export interface Cacher {
+  cacheFn<T = any>(
+    key: string,
+    fn: () => Promise<T>,
+    expire: number,
+    codec?: string
+  ): Promise<T>
+
+  cacheWrapper<T extends (...args: any[]) => Promise<any>>(
+    keyPrefix: string,
+    fn: T,
+    expire: number,
+    codec?: string,
+    keyHasher?: Hasher
+  ): T
+
+  deleteFnCache(
+    keyPrefix: string,
+    args: any[],
+    keyHasher?: Hasher
+  ): Promise<void>
+
+  get<T = any>(key: string, codec?: string): Promise<[T, boolean]>
+
+  set<T = any>(
+    key: string,
+    val: T,
+    expire: number,
+    codec?: string
+  ): Promise<void>
+
+  delete(...keys: string[]): Promise<void>
+}
+
+export class RedisCache implements Cacher {
   onError: ErrorHandler = noopHandler
   private readonly sf = new Singleflight()
   constructor(private readonly option: Option) {
@@ -180,10 +214,6 @@ export class RedisCache {
     return getCodec(codecName ?? this.option.codec)
   }
 
-  private static joinKey(...keys: string[]) {
-    return keys.filter(Boolean).join(':')
-  }
-
   private setupPrometheus() {
     if (!this.option.withPrometheus) {
       return
@@ -215,5 +245,9 @@ export class RedisCache {
       return
     }
     counter.inc(val)
+  }
+
+  static joinKey(...keys: string[]) {
+    return keys.filter(Boolean).join(':')
   }
 }

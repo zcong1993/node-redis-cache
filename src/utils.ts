@@ -1,3 +1,5 @@
+import * as d from 'debug'
+
 const MISSING_REQUIRED_DEPENDENCY = (name: string, reason: string) =>
   `The "${name}" package is missing. Please, make sure to install this library ($ npm install ${name}) to take advantage of ${reason}.`
 
@@ -13,3 +15,5 @@ export const loadPackage = (
     process.exit(1)
   }
 }
+
+export const debug = d('node-redis-cache')
