@@ -276,7 +276,9 @@ it('clean should works well', async () => {
   })
 
   await testClean(c, redis)
+})
 
+it('clean should works well in cluster mode', async () => {
   const cluster = new Redis.Cluster(['redis://localhost:7000/0'])
   const cc = new RedisCache({
     redis: cluster,
