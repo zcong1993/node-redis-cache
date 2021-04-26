@@ -81,6 +81,8 @@ export interface Cacher {
   ): Promise<void>
 
   delete(...keys: string[]): Promise<void>
+
+  clean(match?: string, count?: number): Promise<void>
 }
 
 export class RedisCache implements Cacher {

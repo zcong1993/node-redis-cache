@@ -121,3 +121,29 @@ it('ShardingCache get set should works well', async () => {
       })
   )
 })
+
+it('clean should works well', async () => {
+  const c = createShardingCache('test9')
+
+  const keys = Array(10)
+    .fill(null)
+    .map((_, i) => `key-${i}`)
+  const mockRes = keys.map((key) => ({ key }))
+
+  for (let i = 0; i < keys.length; i++) {
+    await c.set(keys[i], mockRes[i], 5)
+  }
+
+  await c.clean()
+
+  await Promise.all(
+    Array(10)
+      .fill(null)
+      .map((_, i) => {
+        return repeatCall(5, async () => {
+          const [res] = await c.get(keys[i])
+          expect(res).toEqual(null)
+        })
+      })
+  )
+})

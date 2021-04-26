@@ -77,6 +77,12 @@ export class ShardingCache implements Cacher {
     )
   }
 
+  async clean(match: string = '*', count: number = 100) {
+    await Promise.all(
+      [...this.nodeMap.values()].map((node) => node.clean(match, count))
+    )
+  }
+
   private pickNode(key: string) {
     const nodeKey = this.ring.get(key)
     debug(`pick node, key: ${key}, nodeKey: ${nodeKey}`)
