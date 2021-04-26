@@ -2,7 +2,7 @@ import { Redis, Cluster } from 'ioredis'
 import { createHash } from 'crypto'
 import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
-import { loadPackage } from './utils'
+import { loadPackage, redisScanDel } from './utils'
 
 export const notFoundPlaceholder = '*'
 export type IsNotFound = (val: any) => boolean
@@ -203,7 +203,24 @@ export class RedisCache implements Cacher {
     if (keys.length === 0) {
       return
     }
-    await this.option.redis.del(...keys.map((key) => this.buildKey(key)))
+
+    await Promise.all(
+      keys.map((key) => this.option.redis.del(this.buildKey(key)))
+    )
+  }
+
+  async clean(match: string = '*', count: number = 100) {
+    const normalizedPatterns = this.buildKey(match)
+    if (this.option.redis instanceof Cluster) {
+      // get only master nodes to scan for deletion,
+      // if we get slave nodes, it would be failed for deletion.
+      const nodes = this.option.redis.nodes('master')
+      await Promise.all(
+        nodes.map((node) => redisScanDel(node, normalizedPatterns, count))
+      )
+    } else {
+      await redisScanDel(this.option.redis as Redis, normalizedPatterns, count)
+    }
   }
 
   private buildKey(key: string) {
