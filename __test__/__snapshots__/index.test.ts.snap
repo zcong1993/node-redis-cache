@@ -3,37 +3,34 @@
 exports[`withPrometheus should works well 1`] = `
 "# HELP node_cache_requests_total Total number of requests to the cache.
 # TYPE node_cache_requests_total counter
-node_cache_requests_total 11
+node_cache_requests_total{name=\\"my-cache1\\"} 11
 
 # HELP node_cache_hits_total Total number of requests to the cache that were a hit.
 # TYPE node_cache_hits_total counter
-node_cache_hits_total 0
 
 # HELP node_cache_errors_total Total number of errors to the cache.
 # TYPE node_cache_errors_total counter
-node_cache_errors_total 0
 
 # HELP node_cache_hit_not_found_cache_total Total number of requests to the cache that hit a not found cache.
 # TYPE node_cache_hit_not_found_cache_total counter
-node_cache_hit_not_found_cache_total 10
+node_cache_hit_not_found_cache_total{name=\\"my-cache1\\"} 10
 "
 `;
 
 exports[`withPrometheus should works well 2`] = `
 "# HELP node_cache_requests_total Total number of requests to the cache.
 # TYPE node_cache_requests_total counter
-node_cache_requests_total 22
+node_cache_requests_total{name=\\"my-cache1\\"} 22
 
 # HELP node_cache_hits_total Total number of requests to the cache that were a hit.
 # TYPE node_cache_hits_total counter
-node_cache_hits_total 10
+node_cache_hits_total{name=\\"my-cache1\\"} 10
 
 # HELP node_cache_errors_total Total number of errors to the cache.
 # TYPE node_cache_errors_total counter
-node_cache_errors_total 0
 
 # HELP node_cache_hit_not_found_cache_total Total number of requests to the cache that hit a not found cache.
 # TYPE node_cache_hit_not_found_cache_total counter
-node_cache_hit_not_found_cache_total 10
+node_cache_hit_not_found_cache_total{name=\\"my-cache1\\"} 10
 "
 `;

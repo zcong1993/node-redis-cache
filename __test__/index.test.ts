@@ -174,6 +174,7 @@ it('withPrometheus should works well', async () => {
     redis: new Redis(),
     prefix: 'test6',
     withPrometheus: true,
+    name: 'my-cache1',
   })
 
   const cf = c.cacheWrapper('fn', fn, 5)
@@ -219,7 +220,7 @@ it('deleteFnCache should works well', async () => {
   expect(fn).toBeCalledTimes(2)
 })
 
-async function testClean(
+export async function testClean(
   c: RedisCache,
   redis: any,
   isCluster: boolean = false
@@ -276,16 +277,4 @@ it('clean should works well', async () => {
   })
 
   await testClean(c, redis)
-})
-
-it('clean should works well in cluster mode', async () => {
-  const cluster = new Redis.Cluster(['redis://localhost:7000/0'])
-  const cc = new RedisCache({
-    redis: cluster,
-    prefix: 'test9',
-  })
-
-  await cluster.ping()
-
-  await testClean(cc, cluster, true)
 })

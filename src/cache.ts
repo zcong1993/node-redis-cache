@@ -13,6 +13,7 @@ export interface Option {
   withPrometheus?: boolean
   notFoundExpire?: number
   isNOtFound?: IsNotFound
+  name?: string // metrics label name
 }
 
 export type Hasher = (...args: any[]) => string
@@ -47,6 +48,7 @@ const defaultOption: Partial<Option> = {
   codec: 'json',
   notFoundExpire: 10,
   isNOtFound: defaultIsNotFound,
+  name: 'default',
 }
 
 export interface Cacher {
@@ -241,21 +243,25 @@ export class RedisCache implements Cacher {
     requestsCounter = new promClient.Counter({
       name: 'node_cache_requests_total',
       help: 'Total number of requests to the cache.',
+      labelNames: ['name'],
     })
 
     hitCounter = new promClient.Counter({
       name: 'node_cache_hits_total',
       help: 'Total number of requests to the cache that were a hit.',
+      labelNames: ['name'],
     })
 
     errorsCounter = new promClient.Counter({
       name: 'node_cache_errors_total',
       help: 'Total number of errors to the cache.',
+      labelNames: ['name'],
     })
 
     hitNotFoundCacheCounter = new promClient.Counter({
       name: 'node_cache_hit_not_found_cache_total',
       help: 'Total number of requests to the cache that hit a not found cache.',
+      labelNames: ['name'],
     })
   }
 
@@ -263,7 +269,8 @@ export class RedisCache implements Cacher {
     if (!counter || val <= 0) {
       return
     }
-    counter.inc(val)
+
+    counter.inc({ name: this.option.name }, val)
   }
 
   static joinKey(...keys: string[]) {
