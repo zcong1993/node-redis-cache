@@ -191,8 +191,21 @@ export class RedisCache implements Cacher {
     if (!val) {
       return [null, false]
     }
-    const vv: T = this.getCodecByName(codec).decode(val)
-    return [vv, false]
+
+    try {
+      const vv: T = this.getCodecByName(codec).decode(val)
+      return [vv, false]
+    } catch (err) {
+      // delete invalid cache
+      await this.delete(key)
+      this.incrErrorsCounter(1)
+      this.onError({
+        key,
+        error: err,
+        action: 'decode cache',
+      })
+      return [null, false]
+    }
   }
 
   async set<T = any>(key: string, val: T, expire: number, codec?: string) {

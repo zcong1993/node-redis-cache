@@ -278,3 +278,22 @@ it('clean should works well', async () => {
 
   await testClean(c, redis)
 })
+
+it('should auto delete invalid cache', async () => {
+  const redis = new Redis('redis://localhost/7')
+  const c = new RedisCache({
+    redis,
+    prefix: 'test10',
+  })
+
+  const fn = jest.fn()
+  c.onError = fn
+
+  const realKey = RedisCache.joinKey('test10', 'aaa')
+  await redis.set(realKey, 'xxx', 'ex', 10)
+  const res = await c.get('aaa')
+  expect(res).toEqual([null, false])
+
+  expect(await redis.get(realKey)).toBeNull()
+  expect(fn).toBeCalledTimes(1)
+})
