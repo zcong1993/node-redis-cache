@@ -110,21 +110,21 @@ export class RedisCache implements Cacher {
     expire: number,
     codec?: string
   ): Promise<T> {
-    this.incrCounter(requestsCounter, 1)
+    this.incrRequestsCounter(1)
     try {
       const [val, isNOtFound] = await this.get(key, codec)
       // if is not found cache, return null
       if (isNOtFound) {
-        this.incrCounter(hitNotFoundCacheCounter, 1)
+        this.incrHitNotFoundCacheCounter(1)
         return null
       }
 
       if (val !== null) {
-        this.incrCounter(hitCounter, 1)
+        this.incrHitCounter(1)
         return val
       }
     } catch (err) {
-      this.incrCounter(errorsCounter, 1)
+      this.incrErrorsCounter(1)
       this.onError({
         key,
         error: err,
@@ -137,7 +137,7 @@ export class RedisCache implements Cacher {
       try {
         await this.set(key, res, expire, codec)
       } catch (err) {
-        this.incrCounter(errorsCounter, 1)
+        this.incrErrorsCounter(1)
         this.onError({
           key,
           error: err,
@@ -265,8 +265,24 @@ export class RedisCache implements Cacher {
     })
   }
 
+  private incrRequestsCounter(val: number) {
+    this.incrCounter(requestsCounter, val)
+  }
+
+  private incrHitCounter(val: number) {
+    this.incrCounter(hitCounter, val)
+  }
+
+  private incrErrorsCounter(val: number) {
+    this.incrCounter(errorsCounter, val)
+  }
+
+  private incrHitNotFoundCacheCounter(val: number) {
+    this.incrCounter(hitNotFoundCacheCounter, val)
+  }
+
   private incrCounter(counter: any, val: number) {
-    if (!counter || val <= 0) {
+    if (!counter) {
       return
     }
 
