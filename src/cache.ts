@@ -117,6 +117,7 @@ export class RedisCache implements Cacher {
       const [val, isNOtFound] = await this.get(key, codec)
       // if is not found cache, return null
       if (isNOtFound) {
+        this.incrHitCounter(1)
         this.incrHitNotFoundCacheCounter(1)
         return null
       }
