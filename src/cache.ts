@@ -132,7 +132,7 @@ export class RedisCache implements Cacher {
       })
     }
 
-    return this.sf.do(key, async () => {
+    const [data, fresh] = await this.sf.doWithFresh(key, async () => {
       const res = await fn()
       try {
         await this.set(key, res, expire, codec)
@@ -146,6 +146,13 @@ export class RedisCache implements Cacher {
       }
       return res
     })
+
+    if (!fresh) {
+      console.log('aaa')
+      this.incrHitCounter(1)
+    }
+
+    return data
   }
 
   cacheWrapper<T extends (...args: any[]) => Promise<any>>(
