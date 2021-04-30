@@ -3,6 +3,7 @@ import { createHash } from 'crypto'
 import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
 import { loadPackage, redisScanDel } from './utils'
+import { createStat, Stat } from './stat'
 
 export const notFoundPlaceholder = '*'
 export type IsNotFound = (val: any) => boolean
@@ -90,6 +91,7 @@ export interface Cacher {
 export class RedisCache implements Cacher {
   onError: ErrorHandler = noopHandler
   private readonly sf = new Singleflight()
+  private readonly stat = createStat()
   constructor(private readonly option: Option) {
     this.option = {
       ...defaultOption,
@@ -246,6 +248,12 @@ export class RedisCache implements Cacher {
     }
   }
 
+  getStat(): Stat {
+    return {
+      ...this.stat,
+    }
+  }
+
   private buildKey(key: string) {
     return RedisCache.joinKey(this.option.prefix, key)
   }
@@ -285,18 +293,22 @@ export class RedisCache implements Cacher {
   }
 
   private incrRequestsCounter(val: number) {
+    this.stat.requestsCounter++
     this.incrCounter(requestsCounter, val)
   }
 
   private incrHitCounter(val: number) {
+    this.stat.hitCounter++
     this.incrCounter(hitCounter, val)
   }
 
   private incrErrorsCounter(val: number) {
+    this.stat.errorsCounter++
     this.incrCounter(errorsCounter, val)
   }
 
   private incrHitNotFoundCacheCounter(val: number) {
+    this.stat.hitNotFoundCacheCounter++
     this.incrCounter(hitNotFoundCacheCounter, val)
   }
 

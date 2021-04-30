@@ -34,3 +34,21 @@ node_cache_hits_total{name=\\"my-cache1\\"} 10
 node_cache_hit_not_found_cache_total{name=\\"my-cache1\\"} 10
 "
 `;
+
+exports[`withPrometheus should works well: stat 1`] = `
+Object {
+  "errorsCounter": 0,
+  "hitCounter": 0,
+  "hitNotFoundCacheCounter": 10,
+  "requestsCounter": 11,
+}
+`;
+
+exports[`withPrometheus should works well: stat 2 1`] = `
+Object {
+  "errorsCounter": 0,
+  "hitCounter": 10,
+  "hitNotFoundCacheCounter": 10,
+  "requestsCounter": 22,
+}
+`;

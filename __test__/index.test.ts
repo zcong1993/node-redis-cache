@@ -184,6 +184,7 @@ it('withPrometheus should works well', async () => {
   expect(fn).toBeCalledTimes(1)
 
   expect(await register.metrics()).toMatchSnapshot()
+  expect(c.getStat()).toMatchSnapshot('stat')
 
   const mockRes2 = { name: 'test2', age: 19 }
   expect(await cf(100, mockRes2)).toEqual(mockRes2)
@@ -195,6 +196,7 @@ it('withPrometheus should works well', async () => {
   expect(fn).toBeCalledTimes(2)
 
   expect(await register.metrics()).toMatchSnapshot()
+  expect(c.getStat()).toMatchSnapshot('stat 2')
 })
 
 it('deleteFnCache should works well', async () => {
