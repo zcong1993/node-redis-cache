@@ -148,7 +148,6 @@ export class RedisCache implements Cacher {
     })
 
     if (!fresh) {
-      console.log('aaa')
       this.incrHitCounter(1)
     }
 
