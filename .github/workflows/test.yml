@@ -41,6 +41,9 @@ jobs:
         run: yarn
       - name: run test
         run: yarn test:cov
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
