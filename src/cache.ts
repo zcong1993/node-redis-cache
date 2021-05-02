@@ -91,7 +91,7 @@ export interface Cacher {
 export class RedisCache implements Cacher {
   onError: ErrorHandler = noopHandler
   private readonly sf = new Singleflight()
-  private readonly stat = createStat()
+  private stat = createStat()
   constructor(private readonly option: Option) {
     this.option = {
       ...defaultOption,
@@ -253,6 +253,10 @@ export class RedisCache implements Cacher {
     return {
       ...this.stat,
     }
+  }
+
+  resetStat() {
+    this.stat = createStat()
   }
 
   private buildKey(key: string) {

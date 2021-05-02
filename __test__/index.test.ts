@@ -8,6 +8,7 @@ import {
   setDefaultCodec,
   getCodec,
 } from '../src'
+import { createStat } from '../src/stat'
 
 const mockFn = async <T>(n: number, val: T) =>
   new Promise((r) => {
@@ -197,6 +198,9 @@ it('withPrometheus should works well', async () => {
 
   expect(await register.metrics()).toMatchSnapshot()
   expect(c.getStat()).toMatchSnapshot('stat 2')
+
+  c.resetStat()
+  expect(c.getStat()).toEqual(createStat())
 })
 
 it('deleteFnCache should works well', async () => {
