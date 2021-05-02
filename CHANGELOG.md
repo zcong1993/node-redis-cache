@@ -1,3 +1,17 @@
+# [0.6.0](https://github.com/zcong1993/node-redis-cache/compare/v0.5.0...v0.6.0) (2021-05-02)
+
+### Bug Fixes
+
+- fix metrics ([1b5b3f4](https://github.com/zcong1993/node-redis-cache/commit/1b5b3f4f2a826b86527736c24d95273a48630e6e))
+- hit not found cache placeholder should plus hitCounter ([340b091](https://github.com/zcong1993/node-redis-cache/commit/340b091637ae0e9c37e00aa5f3780ab9a21a3e0d))
+
+### Features
+
+- add clean method ([e16b2b9](https://github.com/zcong1993/node-redis-cache/commit/e16b2b938cdf5b1c7abb57338ff5580dfc6fe8fd))
+- add stat ([e918b91](https://github.com/zcong1993/node-redis-cache/commit/e918b919ed521f66362abdf10e58e24bf118092d))
+- auto delete invalid cache ([67ae249](https://github.com/zcong1993/node-redis-cache/commit/67ae249f1f4fdd9433655e517979007bde06b417))
+- sharding support clean ([e008304](https://github.com/zcong1993/node-redis-cache/commit/e0083048e784d2456eedcc4fafcb191d215b85e0))
+
 # [0.5.0](https://github.com/zcong1993/node-redis-cache/compare/v0.4.0...v0.5.0) (2021-04-13)
 
 ### Features
