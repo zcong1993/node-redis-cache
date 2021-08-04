@@ -22,7 +22,7 @@ export const debug = d('node-redis-cache')
 export const redisScanDel = async (
   redis: Redis,
   match: string,
-  count: number = 100
+  count: number
 ) => {
   return new Promise<void>((resolve, reject) => {
     const stream = redis.scanStream({
@@ -44,10 +44,12 @@ export const redisScanDel = async (
         .then(() => {
           stream.resume()
         })
-        .catch((err) => /* istanbul ignore next */ {
-          err.match = match
-          return reject(err)
-        })
+        .catch(
+          /* istanbul ignore next */ (err) => {
+            err.match = match
+            return reject(err)
+          }
+        )
     })
 
     stream.on('error', (err) => /* istanbul ignore next */ {
