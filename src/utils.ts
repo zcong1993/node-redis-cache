@@ -1,6 +1,7 @@
 import * as d from 'debug'
 import type { Redis } from 'ioredis'
 
+/* istanbul ignore next */
 const MISSING_REQUIRED_DEPENDENCY = (name: string, reason: string) =>
   `The "${name}" package is missing. Please, make sure to install this library ($ npm install ${name}) to take advantage of ${reason}.`
 
