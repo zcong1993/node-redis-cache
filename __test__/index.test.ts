@@ -57,6 +57,16 @@ it('cacheWrapper should works well', async () => {
     expect(res).toEqual(mockRes2)
   })
   expect(fn).toBeCalledTimes(2)
+
+  const fn2 = jest.fn(() => mockFn(10, mockRes2))
+  const cf2 = c.cacheWrapper('test333', fn2, 5)
+  expect(await cf2()).toEqual(mockRes2)
+  expect(fn2).toBeCalledTimes(1)
+  await repeatCall(10, async () => {
+    const res = await cf2()
+    expect(res).toEqual(mockRes2)
+  })
+  expect(fn2).toBeCalledTimes(1)
 })
 
 it('not found should cache', async () => {
