@@ -1,3 +1,13 @@
+# [0.7.0](https://github.com/zcong1993/node-redis-cache/compare/v0.6.0...v0.7.0) (2021-08-04)
+
+### Bug Fixes
+
+- sharding ([d7fdf45](https://github.com/zcong1993/node-redis-cache/commit/d7fdf45eb1da4ec9ba68a84f6ae52e6cb288b7ff))
+
+### Features
+
+- support thisArg ([1e8c819](https://github.com/zcong1993/node-redis-cache/commit/1e8c819847c940e677f7dfc36131fa560565f314))
+
 # [0.6.0](https://github.com/zcong1993/node-redis-cache/compare/v0.5.0...v0.6.0) (2021-05-02)
 
 ### Bug Fixes
