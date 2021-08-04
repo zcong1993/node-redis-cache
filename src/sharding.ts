@@ -1,7 +1,8 @@
 import * as HashRing from 'hashring'
 import type { Servers } from 'hashring'
+import { AsyncReturnType } from 'type-fest'
 import { RedisCache, Hasher, Cacher, md5Hasher } from './cache'
-import { debug } from './utils'
+import { bindThis, debug } from './utils'
 
 export interface Node {
   key: string
@@ -26,14 +27,15 @@ export class ShardingCache implements Cacher {
     this.ring = new HashRing(servers)
   }
 
-  async cacheFn<T = any>(
+  async cacheFn<F extends () => Promise<unknown>>(
     key: string,
-    fn: () => Promise<T>,
+    fn: F,
     expire: number,
-    codec?: string
-  ): Promise<T> {
+    codec?: string,
+    thisArg?: ThisParameterType<F>
+  ): Promise<AsyncReturnType<F>> {
     const node = this.pickNode(key)
-    return node.cacheFn(key, fn, expire, codec)
+    return node.cacheFn(key, fn, expire, codec, thisArg)
   }
 
   cacheWrapper<T extends (...args: any[]) => Promise<any>>(
@@ -41,11 +43,17 @@ export class ShardingCache implements Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher: Hasher = md5Hasher
+    keyHasher: Hasher = md5Hasher,
+    thisArg?: ThisParameterType<T>
   ): T {
     return (((...args: any[]) => {
       const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
-      return this.cacheFn(cacheKey, () => fn(...args), expire, codec)
+      return this.cacheFn(
+        cacheKey,
+        () => bindThis(fn, thisArg)(...args),
+        expire,
+        codec
+      )
     }) as any) as T
   }
 

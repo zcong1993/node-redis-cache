@@ -13,13 +13,22 @@ const repeatCall = (n: number, fn: Function) =>
       .map((_) => fn())
   )
 
-const createShardingCache = (prefix: string, num: number = 2) => {
+const redisClients: Redis.Redis[] = []
+const getOrCreate = async (db: number) => {
+  if (!redisClients[db]) {
+    redisClients[db] = new Redis(`redis://localhost:6379/${db}`)
+    await redisClients[db].flushdb()
+  }
+  return redisClients[db]
+}
+
+const createShardingCache = async (prefix: string, num: number = 2) => {
   const options: ShardingOption = { nodes: [] }
   for (let i = 1; i <= num; i++) {
     options.nodes.push({
       key: `redis-${i}`,
       redisCache: new RedisCache({
-        redis: new Redis(`redis://localhost:6379/${i}`),
+        redis: await getOrCreate(i),
         prefix: prefix,
       }),
       weight: 100,
@@ -31,7 +40,7 @@ const createShardingCache = (prefix: string, num: number = 2) => {
 it('ShardingCache cacheWrapper should works well', async () => {
   const fn = jest.fn(mockFn)
 
-  const c = createShardingCache('test')
+  const c = await createShardingCache('test')
 
   const mockRes = { name: 'test', age: 18 }
   const cf = c.cacheWrapper('fn', fn, 5)
@@ -53,9 +62,47 @@ it('ShardingCache cacheWrapper should works well', async () => {
   expect(fn).toBeCalledTimes(2)
 })
 
+it('bindThis should works well', async () => {
+  const fn = jest.fn(mockFn)
+  const c = await createShardingCache('test')
+
+  const mockRes = { name: 'test', age: 18 }
+
+  class T {
+    async test() {
+      return this.testThis(100, mockRes)
+    }
+
+    async test2(...args: Parameters<typeof mockFn>) {
+      return this.testThis(...args)
+    }
+
+    async testThis(...args: Parameters<typeof mockFn>) {
+      return fn(...args)
+    }
+  }
+
+  const t = new T()
+
+  const cf = () => c.cacheFn('fn', t.test, 5, undefined, t)
+  expect(await cf()).toEqual(mockRes)
+  await repeatCall(10, async () => {
+    const res = await cf()
+    expect(res).toEqual(mockRes)
+  })
+  expect(fn).toBeCalledTimes(1)
+
+  const cf1 = c.cacheWrapper('fn2', t.test2, 5, undefined, undefined, t)
+  await repeatCall(10, async () => {
+    const res = await cf1(100, mockRes)
+    expect(res).toEqual(mockRes)
+  })
+  expect(fn).toBeCalledTimes(2)
+})
+
 it('ShardingCache not found should cache', async () => {
   const fn = jest.fn(mockFn)
-  const c = createShardingCache('test1')
+  const c = await createShardingCache('test1')
 
   const cf = c.cacheWrapper('fn', fn, 5)
   expect(await cf(100, null)).toBe(null)
@@ -66,7 +113,7 @@ it('ShardingCache not found should cache', async () => {
 
 it('ShardingCache cacheFn should works well', async () => {
   const fn = jest.fn(mockFn)
-  const c = createShardingCache('test4')
+  const c = await createShardingCache('test4')
 
   const mockRes = { name: 'test', age: 18 }
   const cf = () => c.cacheFn('fn', () => fn(100, mockRes), 5)
@@ -80,7 +127,7 @@ it('ShardingCache cacheFn should works well', async () => {
 
 it('ShardingCache deleteFnCache should works well', async () => {
   const fn = jest.fn(mockFn)
-  const c = createShardingCache('test7')
+  const c = await createShardingCache('test7')
 
   const mockRes = { name: 'test', age: 18 }
   const cf = c.cacheWrapper('fn', fn, 5)
@@ -99,7 +146,7 @@ it('ShardingCache deleteFnCache should works well', async () => {
 })
 
 it('ShardingCache get set should works well', async () => {
-  const c = createShardingCache('test8')
+  const c = await createShardingCache('test8')
 
   const keys = Array(10)
     .fill(null)
@@ -123,7 +170,7 @@ it('ShardingCache get set should works well', async () => {
 })
 
 it('clean should works well', async () => {
-  const c = createShardingCache('test9')
+  const c = await createShardingCache('test9')
 
   const keys = Array(10)
     .fill(null)

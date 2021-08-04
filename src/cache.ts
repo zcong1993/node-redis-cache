@@ -1,8 +1,9 @@
 import { Redis, Cluster } from 'ioredis'
 import { createHash } from 'crypto'
+import { AsyncReturnType } from 'type-fest'
 import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
-import { loadPackage, redisScanDel } from './utils'
+import { bindThis, loadPackage, redisScanDel } from './utils'
 import { createStat, Stat } from './stat'
 
 export const notFoundPlaceholder = '*'
@@ -53,19 +54,21 @@ const defaultOption: Partial<Option> = {
 }
 
 export interface Cacher {
-  cacheFn<T = any>(
+  cacheFn<F extends () => Promise<unknown>>(
     key: string,
-    fn: () => Promise<T>,
+    fn: F,
     expire: number,
-    codec?: string
-  ): Promise<T>
+    codec?: string,
+    thisArg?: ThisParameterType<F>
+  ): Promise<AsyncReturnType<F>>
 
   cacheWrapper<T extends (...args: any[]) => Promise<any>>(
     keyPrefix: string,
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher?: Hasher
+    keyHasher?: Hasher,
+    thisArg?: ThisParameterType<T>
   ): T
 
   deleteFnCache(
@@ -106,12 +109,13 @@ export class RedisCache implements Cacher {
     }
   }
 
-  async cacheFn<T = any>(
+  async cacheFn<F extends () => Promise<unknown>>(
     key: string,
-    fn: () => Promise<T>,
+    fn: F,
     expire: number,
-    codec?: string
-  ): Promise<T> {
+    codec?: string,
+    thisArg?: ThisParameterType<F>
+  ): Promise<AsyncReturnType<F>> {
     this.incrRequestsCounter(1)
     try {
       const [val, isNOtFound] = await this.get(key, codec)
@@ -136,7 +140,7 @@ export class RedisCache implements Cacher {
     }
 
     const [data, fresh] = await this.sf.doWithFresh(key, async () => {
-      const res = await fn()
+      const res = await bindThis(fn, thisArg)()
       try {
         await this.set(key, res, expire, codec)
       } catch (err) {
@@ -154,7 +158,7 @@ export class RedisCache implements Cacher {
       this.incrHitCounter(1)
     }
 
-    return data
+    return data as AsyncReturnType<F>
   }
 
   cacheWrapper<T extends (...args: any[]) => Promise<any>>(
@@ -162,11 +166,17 @@ export class RedisCache implements Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher: Hasher = md5Hasher
+    keyHasher: Hasher = md5Hasher,
+    thisArg?: ThisParameterType<T>
   ): T {
     return (((...args: any[]) => {
       const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
-      return this.cacheFn(cacheKey, () => fn(...args), expire, codec)
+      return this.cacheFn(
+        cacheKey,
+        () => bindThis(fn, thisArg)(...args),
+        expire,
+        codec
+      )
     }) as any) as T
   }
 

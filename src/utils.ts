@@ -59,3 +59,10 @@ export const redisScanDel = async (
     })
   })
 }
+
+export const bindThis = <T extends (...args: unknown[]) => unknown>(
+  fn: T,
+  thisArg?: ThisParameterType<T>
+): T => {
+  return thisArg == null ? fn : fn.bind(thisArg)
+}

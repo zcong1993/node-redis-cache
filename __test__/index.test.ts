@@ -22,10 +22,20 @@ const repeatCall = (n: number, fn: Function) =>
       .map((_) => fn())
   )
 
+const redis = new Redis()
+
+beforeAll(async () => {
+  await redis.flushdb()
+})
+
+afterAll(() => {
+  redis.disconnect()
+}, 1000)
+
 it('cacheWrapper should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test',
   })
 
@@ -52,7 +62,7 @@ it('cacheWrapper should works well', async () => {
 it('not found should cache', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test1',
   })
 
@@ -66,7 +76,7 @@ it('not found should cache', async () => {
 it('raw codec should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test2',
     codec: 'raw',
   })
@@ -85,7 +95,7 @@ it('raw codec should works well', async () => {
 it('singleflight should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test3',
   })
 
@@ -101,7 +111,7 @@ it('singleflight should works well', async () => {
 it('cacheFn should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test4',
   })
 
@@ -113,6 +123,47 @@ it('cacheFn should works well', async () => {
     expect(res).toEqual(mockRes)
   })
   expect(fn).toBeCalledTimes(1)
+})
+
+it('bindThis should works well', async () => {
+  const fn = jest.fn(mockFn)
+  const c = new RedisCache({
+    redis,
+    prefix: 'test41',
+  })
+
+  const mockRes = { name: 'test', age: 18 }
+
+  class T {
+    async test() {
+      return this.testThis(100, mockRes)
+    }
+
+    async test2(...args: Parameters<typeof mockFn>) {
+      return this.testThis(...args)
+    }
+
+    async testThis(...args: Parameters<typeof mockFn>) {
+      return fn(...args)
+    }
+  }
+
+  const t = new T()
+
+  const cf = () => c.cacheFn('fn', t.test, 5, undefined, t)
+  expect(await cf()).toEqual(mockRes)
+  await repeatCall(10, async () => {
+    const res = await cf()
+    expect(res).toEqual(mockRes)
+  })
+  expect(fn).toBeCalledTimes(1)
+
+  const cf1 = c.cacheWrapper('fn2', t.test2, 5, undefined, undefined, t)
+  await repeatCall(10, async () => {
+    const res = await cf1(100, mockRes)
+    expect(res).toEqual(mockRes)
+  })
+  expect(fn).toBeCalledTimes(2)
 })
 
 it('custom codec should works well', async () => {
@@ -150,7 +201,7 @@ it('custom codec should works well', async () => {
 
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test5',
   })
 
@@ -172,7 +223,7 @@ it('custom codec should works well', async () => {
 it('withPrometheus should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test6',
     withPrometheus: true,
     name: 'my-cache1',
@@ -206,7 +257,7 @@ it('withPrometheus should works well', async () => {
 it('deleteFnCache should works well', async () => {
   const fn = jest.fn(mockFn)
   const c = new RedisCache({
-    redis: new Redis(),
+    redis,
     prefix: 'test7',
   })
 
