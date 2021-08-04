@@ -1,10 +1,16 @@
 import { Redis, Cluster } from 'ioredis'
-import { createHash } from 'crypto'
 import { AsyncReturnType } from 'type-fest'
 import { Singleflight } from '@zcong/singleflight'
 import { getCodec } from './codec'
-import { bindThis, loadPackage, redisScanDel } from './utils'
+import {
+  bindThis,
+  ErrorHandler,
+  loadPackage,
+  noopHandler,
+  redisScanDel,
+} from './utils'
 import { createStat, Stat } from './stat'
+import { Hasher, md5Hasher } from './hasher'
 
 export const notFoundPlaceholder = '*'
 export type IsNotFound = (val: any) => boolean
@@ -18,23 +24,6 @@ export interface Option {
   name?: string // metrics label name
 }
 
-export type Hasher = (...args: any[]) => string
-
-export const md5Hasher: Hasher = (...args: any[]) => {
-  if (args.length === 0) {
-    return ''
-  }
-  return createHash('md5').update(JSON.stringify(args)).digest('hex')
-}
-
-export interface ErrorEvent {
-  key: string
-  error: Error
-  action: string
-}
-
-export type ErrorHandler = (errorEvent: ErrorEvent) => void
-
 let promClient: any = undefined
 
 let requestsCounter: any
@@ -42,10 +31,7 @@ let hitCounter: any
 let errorsCounter: any
 let hitNotFoundCacheCounter: any
 
-const noopHandler: ErrorHandler = () => {}
-
 const defaultIsNotFound = (val: any) => val === null
-
 const defaultOption: Partial<Option> = {
   codec: 'json',
   notFoundExpire: 10,

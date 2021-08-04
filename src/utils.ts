@@ -66,3 +66,13 @@ export const bindThis = <T extends (...args: unknown[]) => unknown>(
 ): T => {
   return thisArg == null ? fn : fn.bind(thisArg)
 }
+
+export interface ErrorEvent {
+  key: string
+  error: Error
+  action: string
+}
+
+export type ErrorHandler = (errorEvent: ErrorEvent) => void
+
+export const noopHandler: ErrorHandler = () => {}
