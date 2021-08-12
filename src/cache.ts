@@ -1,6 +1,6 @@
 import { Redis, Cluster } from 'ioredis'
-import { AsyncReturnType } from 'type-fest'
 import { Singleflight } from '@zcong/singleflight'
+import { AsyncReturnType } from './type'
 import { getCodec } from './codec'
 import {
   bindThis,

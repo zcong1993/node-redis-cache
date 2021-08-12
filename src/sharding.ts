@@ -1,6 +1,6 @@
-import * as HashRing from 'hashring'
+import HashRing from 'hashring'
 import type { Servers } from 'hashring'
-import { AsyncReturnType } from 'type-fest'
+import { AsyncReturnType } from './type'
 import { RedisCache, Cacher } from './cache'
 import { bindThis, debug } from './utils'
 import { Hasher, md5Hasher } from './hasher'
