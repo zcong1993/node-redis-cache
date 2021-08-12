@@ -1,4 +1,4 @@
-import * as Redis from 'ioredis'
+import Redis from 'ioredis'
 import { ValueType } from 'ioredis'
 import { register } from 'prom-client'
 import {

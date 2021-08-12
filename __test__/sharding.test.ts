@@ -1,4 +1,4 @@
-import * as Redis from 'ioredis'
+import Redis from 'ioredis'
 import { RedisCache, ShardingCache, ShardingOption } from '../src'
 
 const mockFn = async <T>(n: number, val: T) =>
