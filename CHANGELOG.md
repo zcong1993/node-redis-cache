@@ -1,3 +1,12 @@
+## [0.7.1](https://github.com/zcong1993/node-redis-cache/compare/v0.7.0...v0.7.1) (2021-08-12)
+
+
+### Bug Fixes
+
+* test type import ([2d51bca](https://github.com/zcong1993/node-redis-cache/commit/2d51bca04e735d73494e4245a9149e43a1d29241))
+
+
+
 # [0.7.0](https://github.com/zcong1993/node-redis-cache/compare/v0.6.0...v0.7.0) (2021-08-04)
 
 ### Bug Fixes
