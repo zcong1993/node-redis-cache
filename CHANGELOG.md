@@ -1,3 +1,12 @@
+## [0.7.2](https://github.com/zcong1993/node-redis-cache/compare/v0.7.1...v0.7.2) (2021-08-12)
+
+
+### Bug Fixes
+
+* release commonjs ([17c6ef1](https://github.com/zcong1993/node-redis-cache/commit/17c6ef1e42265510245817356188b14fad5559b3))
+
+
+
 ## [0.7.1](https://github.com/zcong1993/node-redis-cache/compare/v0.7.0...v0.7.1) (2021-08-12)
 
 
