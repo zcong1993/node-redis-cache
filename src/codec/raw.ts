@@ -7,7 +7,7 @@ export class RawCodec implements Codec {
   }
 
   encode<T = any>(data: T): ValueType {
-    return (data as any) as ValueType
+    return data as any as ValueType
   }
 
   decode<T = any>(val: ValueType): T {

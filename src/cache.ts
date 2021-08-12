@@ -155,7 +155,7 @@ export class RedisCache implements Cacher {
     keyHasher: Hasher = md5Hasher,
     thisArg?: ThisParameterType<T>
   ): T {
-    return (((...args: any[]) => {
+    return ((...args: any[]) => {
       const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
       return this.cacheFn(
         cacheKey,
@@ -163,7 +163,7 @@ export class RedisCache implements Cacher {
         expire,
         codec
       )
-    }) as any) as T
+    }) as any as T
   }
 
   async deleteFnCache(
