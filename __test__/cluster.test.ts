@@ -6,7 +6,7 @@ const mockFn = async <T>(n: number, val: T) =>
     setTimeout(() => r(val), n)
   })
 
-export async function testClean(
+async function testClean(
   c: RedisCache,
   redis: any,
   isCluster: boolean = false
@@ -64,5 +64,5 @@ it('clean should works well in cluster mode', async () => {
 
   await cluster.ping()
 
-  await testClean(cc, cluster, true)
+  await expect(() => testClean(cc, cluster, true)).rejects.not.toThrow()
 })

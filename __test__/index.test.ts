@@ -287,7 +287,7 @@ it('deleteFnCache should works well', async () => {
   expect(fn).toBeCalledTimes(2)
 })
 
-export async function testClean(
+async function testClean(
   c: RedisCache,
   redis: any,
   isCluster: boolean = false
@@ -343,7 +343,7 @@ it('clean should works well', async () => {
     prefix: 'test8',
   })
 
-  await testClean(c, redis)
+  await expect(() => testClean(c, redis)).rejects.not.toThrow()
 })
 
 it('should auto delete invalid cache', async () => {
