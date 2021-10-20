@@ -343,7 +343,7 @@ it('clean should works well', async () => {
     prefix: 'test8',
   })
 
-  await expect(() => testClean(c, redis)).rejects.not.toThrow()
+  await testClean(c, redis)
 })
 
 it('should auto delete invalid cache', async () => {

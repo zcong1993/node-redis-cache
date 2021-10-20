@@ -64,5 +64,5 @@ it('clean should works well in cluster mode', async () => {
 
   await cluster.ping()
 
-  await expect(() => testClean(cc, cluster, true)).rejects.not.toThrow()
+  await testClean(cc, cluster, true)
 })
