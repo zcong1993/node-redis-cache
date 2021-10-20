@@ -1,4 +1,4 @@
-import d from 'debug'
+import { debug as d } from 'debug'
 import type { Redis } from 'ioredis'
 
 /* istanbul ignore next */
