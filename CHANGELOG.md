@@ -1,3 +1,13 @@
+# [0.8.0-beta.0](https://github.com/zcong1993/node-redis-cache/compare/v0.7.3...v0.8.0-beta.0) (2021-12-03)
+
+### Features
+
+- add combineKeyStringer make the cache key obvious for simple type args ([225f1ba](https://github.com/zcong1993/node-redis-cache/commit/225f1ba0a09d09588df858fda35ed27ccbf8678a))
+
+### BREAKING CHANGES
+
+- Hasher is renamed to KeyStringer and md5KeyStringer is renamed to md5KeyStringer, all of those all deprecated in future. The default keyStringer changed to combineKeyStringer.
+
 ## [0.7.3](https://github.com/zcong1993/node-redis-cache/compare/v0.7.2...v0.7.3) (2021-10-20)
 
 ### Bug Fixes
