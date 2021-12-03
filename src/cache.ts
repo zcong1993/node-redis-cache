@@ -10,7 +10,7 @@ import {
   redisScanDel,
 } from './utils'
 import { createStat, Stat } from './stat'
-import { Hasher, md5Hasher } from './hasher'
+import { KeyStringer, combineKeyStringer } from './keyStringer'
 
 export const notFoundPlaceholder = '*'
 export type IsNotFound = (val: any) => boolean
@@ -53,14 +53,14 @@ export interface Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher?: Hasher,
+    keyHasher?: KeyStringer,
     thisArg?: ThisParameterType<T>
   ): T
 
   deleteFnCache(
     keyPrefix: string,
     args: any[],
-    keyHasher?: Hasher
+    keyHasher?: KeyStringer
   ): Promise<void>
 
   get<T = any>(key: string, codec?: string): Promise<[T, boolean]>
@@ -152,7 +152,7 @@ export class RedisCache implements Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher: Hasher = md5Hasher,
+    keyHasher: KeyStringer = combineKeyStringer,
     thisArg?: ThisParameterType<T>
   ): T {
     return ((...args: any[]) => {
@@ -169,7 +169,7 @@ export class RedisCache implements Cacher {
   async deleteFnCache(
     keyPrefix: string,
     args: any[],
-    keyHasher: Hasher = md5Hasher
+    keyHasher: KeyStringer = combineKeyStringer
   ) {
     const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
     await this.delete(cacheKey)

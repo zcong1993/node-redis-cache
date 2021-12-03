@@ -1,10 +1,10 @@
-import { createHash } from 'crypto'
+import { KeyStringer, md5KeyStringer } from './keyStringer'
 
-export type Hasher = (...args: any[]) => string
-
-export const md5Hasher: Hasher = (...args: any[]) => {
-  if (args.length === 0) {
-    return ''
-  }
-  return createHash('md5').update(JSON.stringify(args)).digest('hex')
-}
+/**
+ * @deprecated use KeyStringer
+ */
+export type Hasher = KeyStringer
+/**
+ * @deprecated use md5KeyStringer
+ */
+export const md5Hasher = md5KeyStringer

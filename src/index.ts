@@ -1,5 +1,6 @@
 export * from './cache'
 export * from './codec'
 export * from './sharding'
-export * from './hasher'
+export * from './keyStringer'
 export * from './utils'
+export * from './hasher'

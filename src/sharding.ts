@@ -3,7 +3,7 @@ import type { Servers } from 'hashring'
 import { AsyncReturnType } from './type'
 import { RedisCache, Cacher } from './cache'
 import { bindThis, debug } from './utils'
-import { Hasher, md5Hasher } from './hasher'
+import { KeyStringer, combineKeyStringer } from './keyStringer'
 
 export interface Node {
   key: string
@@ -44,7 +44,7 @@ export class ShardingCache implements Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher: Hasher = md5Hasher,
+    keyHasher: KeyStringer = combineKeyStringer,
     thisArg?: ThisParameterType<T>
   ): T {
     return ((...args: any[]) => {
@@ -61,7 +61,7 @@ export class ShardingCache implements Cacher {
   async deleteFnCache(
     keyPrefix: string,
     args: any[],
-    keyHasher: Hasher = md5Hasher
+    keyHasher: KeyStringer = combineKeyStringer
   ) {
     const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
     await this.delete(cacheKey)
