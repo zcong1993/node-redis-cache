@@ -44,11 +44,11 @@ export class ShardingCache implements Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher: KeyStringer = combineKeyStringer,
+    keyStringer: KeyStringer = combineKeyStringer,
     thisArg?: ThisParameterType<T>
   ): T {
     return ((...args: any[]) => {
-      const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
+      const cacheKey = RedisCache.joinKey(keyPrefix, keyStringer(...args))
       return this.cacheFn(
         cacheKey,
         () => bindThis(fn, thisArg)(...args),
@@ -61,9 +61,9 @@ export class ShardingCache implements Cacher {
   async deleteFnCache(
     keyPrefix: string,
     args: any[],
-    keyHasher: KeyStringer = combineKeyStringer
+    keyStringer: KeyStringer = combineKeyStringer
   ) {
-    const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
+    const cacheKey = RedisCache.joinKey(keyPrefix, keyStringer(...args))
     await this.delete(cacheKey)
   }
 

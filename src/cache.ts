@@ -53,14 +53,14 @@ export interface Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher?: KeyStringer,
+    keyStringer?: KeyStringer,
     thisArg?: ThisParameterType<T>
   ): T
 
   deleteFnCache(
     keyPrefix: string,
     args: any[],
-    keyHasher?: KeyStringer
+    keyStringer?: KeyStringer
   ): Promise<void>
 
   get<T = any>(key: string, codec?: string): Promise<[T, boolean]>
@@ -152,11 +152,11 @@ export class RedisCache implements Cacher {
     fn: T,
     expire: number,
     codec?: string,
-    keyHasher: KeyStringer = combineKeyStringer,
+    keyStringer: KeyStringer = combineKeyStringer,
     thisArg?: ThisParameterType<T>
   ): T {
     return ((...args: any[]) => {
-      const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
+      const cacheKey = RedisCache.joinKey(keyPrefix, keyStringer(...args))
       return this.cacheFn(
         cacheKey,
         () => bindThis(fn, thisArg)(...args),
@@ -169,9 +169,9 @@ export class RedisCache implements Cacher {
   async deleteFnCache(
     keyPrefix: string,
     args: any[],
-    keyHasher: KeyStringer = combineKeyStringer
+    keyStringer: KeyStringer = combineKeyStringer
   ) {
-    const cacheKey = RedisCache.joinKey(keyPrefix, keyHasher(...args))
+    const cacheKey = RedisCache.joinKey(keyPrefix, keyStringer(...args))
     await this.delete(cacheKey)
   }
 
