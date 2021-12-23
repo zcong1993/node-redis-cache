@@ -1,4 +1,22 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
+
+exports[`withPrometheus should works well > stat 1`] = `
+{
+  "errorsCounter": 0,
+  "hitCounter": 10,
+  "hitNotFoundCacheCounter": 10,
+  "requestsCounter": 11,
+}
+`;
+
+exports[`withPrometheus should works well > stat 2 1`] = `
+{
+  "errorsCounter": 0,
+  "hitCounter": 20,
+  "hitNotFoundCacheCounter": 10,
+  "requestsCounter": 22,
+}
+`;
 
 exports[`withPrometheus should works well 1`] = `
 "# HELP node_cache_requests_total Total number of requests to the cache.
