@@ -12,8 +12,8 @@
     "test:cov": "npm run lint && npm run jest:cov",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write '**/*.{ts,json,md}'",
-    "jest": "jest --detectOpenHandles --forceExit",
-    "jest:cov": "jest --coverage --detectOpenHandles --forceExit",
+    "jest": "vitest",
+    "jest:cov": "vitest --coverage",
     "prepublishOnly": "npm run build",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
@@ -26,26 +26,22 @@
     "@types/debug": "^4.1.7",
     "@types/hashring": "^3.2.1",
     "@types/ioredis": "^4.28.1",
-    "@types/jest": "^27.0.3",
     "@types/node": "^16.11.11",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
     "@zcong/js-release": "^0.2.5",
+    "c8": "^7.10.0",
     "eslint": "^8.3.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-jest": "^25.3.0",
     "husky": "^7.0.4",
     "ioredis": "^4.28.2",
-    "jest": "^27.4.3",
     "lint-staged": "^12.1.2",
     "prettier": "^2.5.0",
     "prom-client": "^14.0.1",
-    "ts-jest": "^27.0.7",
-    "typescript": "^4.5.2"
-  },
-  "jest": {
-    "preset": "ts-jest"
+    "typescript": "^4.5.2",
+    "vite": "^2.7.6",
+    "vitest": "^0.0.109"
   },
   "lint-staged": {
     "*.{js,json,ts,md}": "prettier --write"

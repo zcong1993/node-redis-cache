@@ -1,3 +1,4 @@
+import { it, expect, vi } from 'vitest'
 import Redis from 'ioredis'
 import { RedisCache } from '../src'
 
@@ -11,7 +12,7 @@ async function testClean(
   redis: any,
   isCluster: boolean = false
 ) {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const cf = c.cacheWrapper('fn', fn, 5)
 
   const getDbSize = async () => {

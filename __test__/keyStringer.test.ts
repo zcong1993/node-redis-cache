@@ -1,3 +1,4 @@
+import { it, expect, describe } from 'vitest'
 import { combineKeyStringer, md5KeyStringer } from '../src/keyStringer'
 
 describe('combineKeyStringer', () => {
