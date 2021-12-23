@@ -5,6 +5,7 @@ const maxKeyLen = 200
 export type KeyStringer = (...args: any[]) => string
 
 export const md5KeyStringer: KeyStringer = (...args: any[]) => {
+  /* c8 ignore next 3 */
   if (args.length === 0) {
     return ''
   }

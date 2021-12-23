@@ -11,8 +11,8 @@ export class JSONCodec implements Codec {
   }
 
   decode<T>(val: ValueType): T {
+    /* c8 ignore next 3 */
     if (typeof val !== 'string') {
-      /* istanbul ignore next */
       throw new DecodeError('not a string')
     }
     return JSON.parse(val)
