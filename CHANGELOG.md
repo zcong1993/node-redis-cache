@@ -1,3 +1,5 @@
+# [0.8.0](https://github.com/zcong1993/node-redis-cache/compare/v0.8.0-beta.0...v0.8.0) (2022-03-26)
+
 # [0.8.0-beta.0](https://github.com/zcong1993/node-redis-cache/compare/v0.7.3...v0.8.0-beta.0) (2021-12-03)
 
 ### Features
