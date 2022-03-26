@@ -1,5 +1,4 @@
 import Redis from 'ioredis'
-import { ValueType } from 'ioredis'
 import { register } from 'prom-client'
 import {
   RedisCache,
@@ -7,6 +6,7 @@ import {
   registerCodec,
   setDefaultCodec,
   getCodec,
+  ValueType,
 } from '../src'
 import { createStat } from '../src/stat'
 
@@ -357,7 +357,7 @@ it('should auto delete invalid cache', async () => {
   c.onError = fn
 
   const realKey = RedisCache.joinKey('test10', 'aaa')
-  await redis.set(realKey, 'xxx', 'ex', 10)
+  await redis.set(realKey, 'xxx', 'EX', 10)
   const res = await c.get('aaa')
   expect(res).toEqual([null, false])
 
