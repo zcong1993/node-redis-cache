@@ -1,5 +1,4 @@
-import { ValueType } from 'ioredis'
-import { Codec, DecodeError } from './codec'
+import { Codec, DecodeError, ValueType } from './codec'
 
 export class JSONCodec implements Codec {
   name() {

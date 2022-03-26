@@ -1,5 +1,5 @@
 import { debug as d } from 'debug'
-import type { Redis } from 'ioredis'
+import type { default as Redis } from 'ioredis'
 
 /* istanbul ignore next */
 const MISSING_REQUIRED_DEPENDENCY = (name: string, reason: string) =>

@@ -1,5 +1,4 @@
-import { ValueType } from 'ioredis'
-import { Codec } from './codec'
+import { Codec, ValueType } from './codec'
 
 export class RawCodec implements Codec {
   name() {

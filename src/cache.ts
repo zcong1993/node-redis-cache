@@ -1,4 +1,4 @@
-import { Redis, Cluster } from 'ioredis'
+import Redis, { Cluster } from 'ioredis'
 import { Singleflight } from '@zcong/singleflight'
 import { AsyncReturnType } from './type'
 import { getCodec } from './codec'
@@ -212,13 +212,13 @@ export class RedisCache implements Cacher {
       await this.option.redis.set(
         this.buildKey(key),
         notFoundPlaceholder,
-        'ex',
+        'EX',
         this.option.notFoundExpire
       )
       return
     }
     const vv = this.getCodecByName(codec).encode(val)
-    await this.option.redis.set(this.buildKey(key), vv, 'ex', expire)
+    await this.option.redis.set(this.buildKey(key), vv, 'EX', expire)
   }
 
   async delete(...keys: string[]) {

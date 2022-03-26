@@ -13,7 +13,7 @@ const repeatCall = (n: number, fn: Function) =>
       .map((_) => fn())
   )
 
-const redisClients: Redis.Redis[] = []
+const redisClients: Redis[] = []
 const getOrCreate = async (db: number) => {
   if (!redisClients[db]) {
     redisClients[db] = new Redis(`redis://localhost:6379/${db}`)

@@ -1,4 +1,4 @@
-import { ValueType } from 'ioredis'
+export type ValueType = string | Buffer | number
 
 export interface Codec {
   name(): string
