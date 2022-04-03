@@ -38,7 +38,7 @@ const createShardingCache = async (prefix: string, num: number = 2) => {
 }
 
 it('ShardingCache cacheWrapper should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
 
   const c = await createShardingCache('test')
 
@@ -63,7 +63,7 @@ it('ShardingCache cacheWrapper should works well', async () => {
 })
 
 it('bindThis should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = await createShardingCache('test')
 
   const mockRes = { name: 'test', age: 18 }
@@ -101,7 +101,7 @@ it('bindThis should works well', async () => {
 })
 
 it('ShardingCache not found should cache', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = await createShardingCache('test1')
 
   const cf = c.cacheWrapper('fn', fn, 5)
@@ -112,7 +112,7 @@ it('ShardingCache not found should cache', async () => {
 })
 
 it('ShardingCache cacheFn should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = await createShardingCache('test4')
 
   const mockRes = { name: 'test', age: 18 }
@@ -126,7 +126,7 @@ it('ShardingCache cacheFn should works well', async () => {
 })
 
 it('ShardingCache deleteFnCache should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = await createShardingCache('test7')
 
   const mockRes = { name: 'test', age: 18 }

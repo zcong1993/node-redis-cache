@@ -33,7 +33,7 @@ afterAll(() => {
 }, 1000)
 
 it('cacheWrapper should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test',
@@ -58,7 +58,7 @@ it('cacheWrapper should works well', async () => {
   })
   expect(fn).toBeCalledTimes(2)
 
-  const fn2 = jest.fn(() => mockFn(10, mockRes2))
+  const fn2 = vi.fn(() => mockFn(10, mockRes2))
   const cf2 = c.cacheWrapper('test333', fn2, 5)
   expect(await cf2()).toEqual(mockRes2)
   expect(fn2).toBeCalledTimes(1)
@@ -70,7 +70,7 @@ it('cacheWrapper should works well', async () => {
 })
 
 it('not found should cache', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test1',
@@ -84,7 +84,7 @@ it('not found should cache', async () => {
 })
 
 it('raw codec should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test2',
@@ -103,7 +103,7 @@ it('raw codec should works well', async () => {
 })
 
 it('singleflight should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test3',
@@ -119,7 +119,7 @@ it('singleflight should works well', async () => {
 })
 
 it('cacheFn should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test4',
@@ -136,7 +136,7 @@ it('cacheFn should works well', async () => {
 })
 
 it('bindThis should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test41',
@@ -209,7 +209,7 @@ it('custom codec should works well', async () => {
   registerCodec(new TestCodec())
   setDefaultCodec(testCodecName)
 
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test5',
@@ -231,7 +231,7 @@ it('custom codec should works well', async () => {
 })
 
 it('withPrometheus should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test6',
@@ -265,7 +265,7 @@ it('withPrometheus should works well', async () => {
 })
 
 it('deleteFnCache should works well', async () => {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const c = new RedisCache({
     redis,
     prefix: 'test7',
@@ -292,7 +292,7 @@ async function testClean(
   redis: any,
   isCluster: boolean = false
 ) {
-  const fn = jest.fn(mockFn)
+  const fn = vi.fn(mockFn)
   const cf = c.cacheWrapper('fn', fn, 5)
 
   const getDbSize = async () => {
@@ -353,7 +353,7 @@ it('should auto delete invalid cache', async () => {
     prefix: 'test10',
   })
 
-  const fn = jest.fn()
+  const fn = vi.fn()
   c.onError = fn
 
   const realKey = RedisCache.joinKey('test10', 'aaa')
