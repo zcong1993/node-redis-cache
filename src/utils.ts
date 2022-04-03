@@ -1,7 +1,7 @@
 import { debug as d } from 'debug'
 import type { default as Redis } from 'ioredis'
 
-/* istanbul ignore next */
+/* c8 ignore next */
 const MISSING_REQUIRED_DEPENDENCY = (name: string, reason: string) =>
   `The "${name}" package is missing. Please, make sure to install this library ($ npm install ${name}) to take advantage of ${reason}.`
 
@@ -12,7 +12,7 @@ export const loadPackage = (
 ) => {
   try {
     return loaderFn ? loaderFn() : require(packageName)
-  } catch (e) /* istanbul ignore next */ {
+  } catch (e) /* c8 ignore next 2 */ {
     console.error(MISSING_REQUIRED_DEPENDENCY(packageName, context))
     process.exit(1)
   }
@@ -46,14 +46,14 @@ export const redisScanDel = async (
           stream.resume()
         })
         .catch(
-          /* istanbul ignore next */ (err) => {
+          /* c8 ignore next 3 */ (err) => {
             err.match = match
             return reject(err)
           }
         )
     })
 
-    stream.on('error', (err) => /* istanbul ignore next */ {
+    stream.on('error', (err) => /* c8 ignore next */ {
       reject(err)
     })
 
