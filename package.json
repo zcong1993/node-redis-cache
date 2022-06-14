@@ -17,7 +17,7 @@
     "prepublishOnly": "npm run build",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
-    "release": "js-release"
+    "release": "bumpp --commit --push --tag"
   },
   "types": "./dist/index.d.ts",
   "author": "zcong1993",
@@ -29,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "@zcong/js-release": "^0.2.5",
+    "bumpp": "^7.1.1",
     "c8": "^7.11.3",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
